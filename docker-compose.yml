@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app_container
+    depends_on:
+      - mysql
+      - rabbitmq
+      - elasticsearch
+    volumes:
+      - ./src:/var/www/html/
+    networks:
+      - app-network
+    ports:
+      - "80:80"
+      - "6001:6001"
+
+  elasticsearch:
+    container_name: elasticsearch_container
+    image: elasticsearch:8.6.2
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ELASTIC_PASSWORD=elastic
+    ports:
+      - "9200:9200"
+    networks:
+      - app-network
+
+  mysql:
+    container_name: mysql_container
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: appdb
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  rabbitmq:
+    container_name: rabbitmq_container
+    image: rabbitmq:3.9.28-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
