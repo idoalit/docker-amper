@@ -29,6 +29,32 @@ services:
     networks:
       - app-network
 
+  solr:
+    container_name: solr_container
+    image: solr
+    ports:
+     - "8983:8983"
+    volumes:
+      - ./solr:/var/solr
+    command:
+      - solr-precreate
+      - gettingstarted
+    networks:
+      - app-network
+
+  kibana:
+    container_name: kibana_container
+    image: kibana:8.6.2
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch_container:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch_container:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - app-network
+
   mysql:
     container_name: mysql_container
     image: mysql:latest
@@ -52,6 +78,43 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - app-network
+
+  nsqlookupd:
+    container_name: nsqlookupd_container
+    image: nsqio/nsq
+    command: /nsqlookupd
+    ports:
+      - "4160:4160"
+      - "4161:4161"
+    networks:
+      - app-network
+
+  nsqd:
+    container_name: nsqd_container
+    image: nsqio/nsq
+    command: /nsqd --broadcast-address nsqd --lookupd-tcp-address=nsqlookupd:4160
+    links:
+      - nsqlookupd:nsqlookupd
+    depends_on:
+      - nsqlookupd
+    ports:
+      - "64150:4150"
+      - "64151:4150"
+    networks:
+      - app-network
+
+  nsqadmin:
+    container_name: nsqadmin_container
+    image: nsqio/nsq
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    links:
+      - nsqlookupd:nsqlookupd
+    depends_on:
+      - nsqlookupd  
+    ports:
+      - "4171:4171"
     networks:
       - app-network
 
