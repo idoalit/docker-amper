@@ -39,5 +39,13 @@ RUN docker-php-ext-install pdo pdo_mysql
 # install gettext
 RUN docker-php-ext-install gettext
 
+# install PHPinnacle Buffer C Extension
+RUN git clone https://github.com/phpinnacle/ext-buffer
+RUN cd ext-buffer \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install
+
 # move to docroot
 WORKDIR /var/www/html
