@@ -14,10 +14,11 @@ RUN docker-php-ext-install zip xml
 
 # install gd
 RUN apt-get update && apt-get install -y \
+    libfreetype6-dev \
     libjpeg-dev \
     libjpeg62-turbo-dev \
     libpng-dev 
-RUN docker-php-ext-configure gd --with-jpeg 
+RUN docker-php-ext-configure gd --with-jpeg --with-freetype 
 RUN docker-php-ext-install -j$(nproc) gd
 
 # install yaz
