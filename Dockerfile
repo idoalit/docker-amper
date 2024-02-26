@@ -12,7 +12,8 @@ WORKDIR /tmp
 RUN apt-get update && apt-get install -y \
     zip \
     libxml2-dev \
-    libzip-dev
+    libzip-dev \
+    && apt-get clean
 
 # Install zip and zml
 RUN docker-php-ext-install zip xml
@@ -22,7 +23,9 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libjpeg-dev \
     libjpeg62-turbo-dev \
-    libpng-dev 
+    libpng-dev \
+    && apt-get clean
+    
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype 
 RUN docker-php-ext-install -j$(nproc) gd
 
