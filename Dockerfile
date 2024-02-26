@@ -1,5 +1,10 @@
 FROM php:8.2-apache
 
+# Define custom PHP configuration
+RUN echo "post_max_size = 40M" >> /usr/local/etc/php/conf.d/custom.ini
+RUN echo "upload_max_filesize = 40M" >> /usr/local/etc/php/conf.d/custom.ini
+RUN echo "max_execution_time = 600" >> /usr/local/etc/php/conf.d/custom.ini
+
 # move to tmp folder
 WORKDIR /tmp
 
